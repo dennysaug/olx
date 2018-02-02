@@ -1,0 +1,6 @@
+CATEGORIA=Moda e beleza
+SUBCATEGORIA=Bolsas, malas e mochilas
+NOVO/USADO=Novo
+TITULO=Vendo lindo vestido, bolsa e colar
+PRECO=280
+CEP=66060460
