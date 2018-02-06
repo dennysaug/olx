@@ -6,8 +6,8 @@
 
 import os
 import time
-import glob
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 
 
 
@@ -19,13 +19,14 @@ def main():
     #dia = int(raw_input("Repostar em dia(s): "))
 
     logins = []
-    logins.insert(0, {"login": "dennysaug@gmail.com", "senha": "xxx"})
+    logins.insert(0, {"login": "seixas.camilla@hotmail.com", "senha": "xxx"})
+    logins.insert(1, {"login": "dennysaugustus@hotmail.com", "senha": "xxx"})    
+    logins.insert(2, {"login": "dennysaug@gmail.com", "senha": "xxx"})
 
-
-    postcount = {"dennysaug@gmail.com": 0}
+    postcount = {"dennysaug@gmail.com": 0, "seixas.camilla@hotmail.com": 0, "dennysaugustus@hotmail.com": 0}
     dia = 2
 
-    destino = r"/home/dennys/PycharmProjects/olx/anuncios"
+    destino = r"/home/pi/Downloads/olx/anuncios"
 
     os.system('clear')
 
@@ -49,6 +50,8 @@ def main():
             browser.find_element_by_id("bt_submit_login").click()
             time.sleep(10)
 
+            deletarPost(browser)
+
             anuncios = os.listdir(destino)
             for diretorio in anuncios:
                 print "[*] Publicando anuncio: " + diretorio
@@ -66,15 +69,15 @@ def main():
                 subcategoria = "8060" #""Bolsas, malas e mochilas"
                 novoUsado = "Novo"
                 titulo = "Bolsas Feminina (Promoção)"
-                preco = ""
+                preco = "90"
                 cep = "66060460"
 
                 time.sleep(5)
 
-                if not usuario == "xxxxxxx@hotmail.com":
+                if not usuario == "seixas.camilla@hotmail.com":
                     browser.find_element_by_id("phone_hidden").click()
                     browser.find_element_by_id("name").clear()
-                    browser.find_element_by_id("name").send_keys("xxxxx")
+                    browser.find_element_by_id("name").send_keys("Camilla Seixas")
 
                 browser.find_element_by_id(categoria).click()
                 time.sleep(2)
@@ -99,21 +102,22 @@ def main():
                 browser.find_element_by_name("image").send_keys(destino+"/"+diretorio+"/04.jpg")
                 time.sleep(2)
                 browser.find_element_by_name("image").send_keys(destino+"/"+diretorio+"/05.jpg")
-                #time.sleep(2)
+                time.sleep(5)
                 #browser.find_element_by_name("image").send_keys(destino+"/"+diretorio+"/06.jpg")
                 #time.sleep(10)
-
-
-
-                #browser.find_element_by_id("submit_create_now").click()
+                
+                scroll = browser.find_element_by_class_name('copyright')
+                scroll.location_once_scrolled_into_view                               
+                             
+                browser.find_element_by_name("create").click()
                 time.sleep(10)
 
-                print "[*] Publicacao concluida\n"
+                print "[*] Publicacao concluida"
                 postcount[usuario] += 1
-                print "[*] Total de anuncios: " + str(postcount[usuario])
+                print "[*] Total de anuncios: " + str(postcount[usuario]) +"\n"
                 i += 1
             browser.quit()
-            time.sleep(dia * 15)
+            time.sleep(dia * 84600)
 
 
 
@@ -131,6 +135,34 @@ def init():
     browser.delete_all_cookies()
     browser.maximize_window()
     return browser
+
+def deletarPost(browser):
+    i = 1
+    while True:
+        try:
+            if not browser.current_url == "https://www3.olx.com.br/account/userads/":
+                browser.get("https://www3.olx.com.br/account/userads/")
+
+            post = browser.find_element_by_class_name("description__action")
+            deletar = post.find_elements_by_tag_name("a")[1]
+            deletar.click()
+            time.sleep(6)
+            browser.find_element_by_id("reason_3").click()
+            time.sleep(2)
+            browser.find_element_by_class_name("close-lightbox").click()
+            browser.find_element_by_id("level_10").click()
+            browser.find_element_by_id("bt_continue").click()
+            print "[*] Deletando " + str(i) + " anuncio(s)"
+            i += 1
+            time.sleep(6)
+
+        except NoSuchElementException:
+            print "[*] Nenhum anuncio para deletar"
+            break
+
+
+
+
 
 
 if __name__ == '__main__':
